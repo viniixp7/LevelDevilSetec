@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b0b0f">
+    <title>Parkour Run — Devil Edition</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="game-canvas" aria-label="Jogo Parkour Run Devil Edition"></canvas>
+
+    <!-- ================= HUD ================= -->
+    <div id="hud" class="hidden" aria-hidden="true">
+        <div class="hud-side">
+            <div class="hud-level" id="hud-level">FASE 01 <span>/ 25</span></div>
+            <div class="hud-name" id="hud-name">FÁCIL, NÉ?</div>
+            <div class="hud-difficulty" id="hud-difficulty">DIFICULDADE ×1.00</div>
+        </div>
+
+        <div class="hud-side hud-right">
+            <div class="hud-stat">
+                <span>MORTES</span>
+                <b id="hud-deaths">0</b>
+            </div>
+            <div class="hud-stat">
+                <span>TEMPO</span>
+                <b id="hud-time">00:00</b>
+            </div>
+            <button id="btn-sound" class="hud-btn" type="button" title="Ativar ou desativar o som">SOM</button>
+            <button id="btn-pause" class="hud-btn" type="button" title="Pausar (ESC)">II</button>
+        </div>
+    </div>
+
+    <div id="banner" role="status" aria-live="polite"></div>
+
+    <div id="controls-hint">
+        <span><b>A</b> <b>D</b> mover</span>
+        <span><b>ESPAÇO</b> pular</span>
+        <span><b>R</b> reiniciar</span>
+        <span><b>ESC</b> pausar</span>
+    </div>
+
+    <!-- ================= SPLASH DE IMPACTO ================= -->
+    <div id="intro-splash" class="screen" role="button" tabindex="0" aria-label="Entrar na apresentação do jogo">
+        <div class="intro-stripe stripe-top"></div>
+        <div class="intro-stripe stripe-bottom"></div>
+        <div class="intro-glow"></div>
+        <div class="intro-grid"></div>
+
+        <main class="intro-main">
+            <div class="intro-logo-wrap">
+                <img src="logo.png" alt="Logo do Colégio Estadual Barbosa Ferraz" class="intro-logo">
+            </div>
+
+            <p class="intro-school">COLÉGIO ESTADUAL BARBOSA FERRAZ</p>
+            <h1 class="intro-title">PARKOUR <span>RUN</span></h1>
+            <div class="intro-edition">DEVIL EDITION</div>
+            <p class="intro-tagline">2 mundos. 50 fases. O chão mente. A porta foge. Você vai morrer.</p>
+
+            <button id="btn-intro-enter" class="intro-cta" type="button">
+                <span class="intro-cta-icon">▶</span> ENTRAR NO JOGO
+            </button>
+            <p class="intro-hint">CLIQUE OU TOQUE PARA ENTRAR <span>•</span> <kbd>ENTER</kbd></p>
+        </main>
+
+        <footer class="intro-foot">
+            <span>UMA EXPERIÊNCIA INSPIRADA EM LEVEL DEVIL</span>
+            <span>DESENVOLVIDO POR <b>VINICIUS RIBEIRO</b> • SALA 2°DS</span>
+        </footer>
+    </div>
+
+    <!-- ================= MENU PRINCIPAL ================= -->
+    <div id="start-menu" class="screen hidden">
+        <div class="menu-bg"></div>
+        <div class="menu-glow"></div>
+
+        <header class="menu-top">
+            <span>COLÉGIO ESTADUAL BARBOSA FERRAZ</span>
+            <span class="menu-top-tag">DEVIL EDITION</span>
+        </header>
+
+        <main class="menu-main">
+            <div class="menu-logo-wrap">
+                <img src="logo.png" alt="Logo do Colégio Estadual Barbosa Ferraz" class="menu-logo">
+            </div>
+
+            <p class="menu-kicker">MENU PRINCIPAL</p>
+            <h2 class="menu-title">PARKOUR <span>RUN</span></h2>
+            <p class="menu-sub">DEVIL EDITION <span>•</span> 2 MUNDOS <span>•</span> <b id="menu-levels">50</b> FASES</p>
+            <p class="menu-desc">O chão mente. A porta foge. Os espinhos não pedem licença.<br>Você consegue chegar ao fim?</p>
+
+            <div class="menu-actions">
+                <button id="btn-menu-start" class="btn btn-primary menu-btn" type="button">INICIAR JOGO</button>
+                <button id="btn-menu-tutorial" class="btn btn-ghost menu-btn" type="button">TUTORIAL DE MOVIMENTAÇÃO</button>
+            </div>
+
+            <p class="menu-note">Dica: se algo parece seguro, provavelmente não é.</p>
+        </main>
+
+        <footer class="menu-footer">
+            <button id="btn-menu-back" class="menu-back" type="button">VOLTAR À TELA INICIAL</button>
+            <span class="menu-credit">DESENVOLVIDO POR <b>VINICIUS RIBEIRO</b> <span class="credit-dot">•</span> SALA 2°DS</span>
+        </footer>
+    </div>
+
+    <!-- ================= TROCA DE MUNDO ================= -->
+    <div id="world-transition" class="screen overlay hidden">
+        <div class="world-card">
+            <p class="modal-kicker" id="world-kicker">MUNDO 1 CONCLUÍDO</p>
+            <h2 class="world-title" id="world-title">MUNDO 2</h2>
+            <p class="world-sub" id="world-sub">MAIS 25 FASES • DIFICULDADE AUMENTADA</p>
+            <div class="world-bar"><i></i></div>
+            <p class="world-hint">PREPARE-SE...</p>
+        </div>
+    </div>
+
+    <!-- ================= PAUSA ================= -->
+    <div id="pause-screen" class="screen overlay hidden">
+        <div class="modal">
+            <p class="modal-kicker">JOGO PAUSADO</p>
+            <h2>RESPIRE.</h2>
+            <p class="modal-text">A fase vai continuar te trollando quando você voltar.</p>
+            <div class="modal-actions">
+                <button id="btn-resume" class="btn btn-primary" type="button">CONTINUAR</button>
+                <button id="btn-restart-level" class="btn" type="button">REINICIAR FASE</button>
+                <button id="btn-pause-tutorial" class="btn btn-ghost" type="button">COMO JOGAR</button>
+                <button id="btn-menu" class="btn btn-danger-ghost" type="button">MENU INICIAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TUTORIAL ================= -->
+    <div id="tutorial-modal" class="screen overlay hidden">
+        <div class="modal modal-tutorial">
+            <p class="modal-kicker">MANUAL DE SOBREVIVÊNCIA</p>
+            <h2>COMO JOGAR</h2>
+
+            <div class="tutorial-grid">
+                <div class="tutorial-row">
+                    <div class="keys"><kbd>A</kbd><kbd>D</kbd><span>ou</span><kbd>SETAS</kbd></div>
+                    <p>Mover para os lados</p>
+                </div>
+                <div class="tutorial-row">
+                    <div class="keys"><kbd>ESPAÇO</kbd></div>
+                    <p>Pular. Segure para pular mais alto.</p>
+                </div>
+                <div class="tutorial-row">
+                    <div class="keys"><kbd>R</kbd></div>
+                    <p>Reiniciar a fase atual</p>
+                </div>
+                <div class="tutorial-row">
+                    <div class="keys"><kbd>ESC</kbd></div>
+                    <p>Pausar o jogo</p>
+                </div>
+            </div>
+
+            <div class="tutorial-note">
+                <b>Isso não é um platformer normal.</b>
+                <p>O chão desaparece, espinhos surgem do nada, a porta foge e o teto cai. Morrer faz parte do plano. Observe, aprenda o padrão e tente de novo.</p>
+            </div>
+
+            <button id="btn-close-tutorial" class="btn btn-primary" type="button">ENTENDI. ME SOLTA.</button>
+        </div>
+    </div>
+
+    <!-- ================= VITÓRIA ================= -->
+    <div id="victory-screen" class="screen overlay hidden">
+        <div class="modal modal-victory">
+            <div class="victory-mark" aria-hidden="true">☠</div>
+            <p class="modal-kicker">VOCÊ SOBREVIVEU</p>
+            <h2>O DEVIL<br>FOI VENCIDO.</h2>
+            <p class="modal-text">Tudo bem, ele deixou você passar. Mas ninguém precisa saber.</p>
+
+            <div class="victory-stats">
+                <div><span>TEMPO TOTAL</span><b id="vic-time">00:00</b></div>
+                <div><span>MORTES</span><b id="vic-deaths">0</b></div>
+                <div><span>FASES</span><b id="vic-levels">50</b></div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btn-restart-game" class="btn btn-primary" type="button">JOGAR DE NOVO</button>
+                <button id="btn-victory-menu" class="btn btn-ghost" type="button">MENU INICIAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CONTROLES TOUCH ================= -->
+    <div id="touch-controls" class="hidden" aria-hidden="true">
+        <div class="touch-move">
+            <button data-touch="left" type="button" aria-label="Mover para a esquerda">◀</button>
+            <button data-touch="right" type="button" aria-label="Mover para a direita">▶</button>
+        </div>
+        <button data-touch="jump" class="touch-jump" type="button" aria-label="Pular">PULAR</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
